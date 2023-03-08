@@ -1,67 +1,114 @@
-import math
-floors = int(input("Enter How Many Floors in Building : "))
-Slots = int(input("Enter How Many Slots in Each Floor Building : "))
+import os
 
-def parking ():
 
-    myfile = open("task.txt","r")
-    lines = myfile.readlines()
-    print(type(lines))
-    print(lines)
-    ll = lines[0].replace('[',"").replace(']',"")
-    a = ll.split(',')
-    Available,Occupied = int(a[0]),int(a[1])
-    print(type(Occupied))
+def Park (user_responce,floors,Slots):
     print(''' Choose Your Response
             1 . Parking 
-            2 . Get
-            3 . Slots Available
-            4 . Exit ''')
-    val = int(input('Enter a Menu Value : '))
-    
-    flr = 1
-    # Occupied = 0
-    # Available = 0
-    count = Slots*floors
-    # print(f"the c value is {count}")
-    # print(Occupied)
+            2 . Slots Available
+            3 . Get
+            4 . View
+            5 . Exit ''')
+    def parking():
+        cnt = 0
+        floor = 0
+        slot = 0
+        for i,j in enumerate(user_responce):
+            while cnt < Slots:                
+                if i == floor and j[cnt] == '1':
+                    floor = floor+1
+                    slot = slot+1
+                    # print(f"floor : {floor} and slot : {slot} and value is = {j[cnt]}")
+                    j[cnt] = '0'
+                    print(f"Your Ticket Number {floor} . {slot} ")
+                    break
+                cnt = cnt + 1
+                slot = slot+1
+            cnt = 0
+            slot = 0
+            floor = floor +1
+        return ' -'
 
+    def slotsavailable():
+        cnt = 0
+        floor = 0
+        for k in user_responce:
+            floor_count = k.count('1')
+            cnt+=floor_count
+            floor+=1
+            print( f"floor :{floor} -- AvailableSlots :{floor_count}")
+        return f"Total Available Slots in Building : {cnt}"
+        
 
-    # val = input('Enter a Menu Value : ')
-    # string = val.lower()
-    if 1 == val:
-        if Occupied == count:
-            return f" There is No Available Space to park "
-    
-        # elif Occupied<0:
-        #     return f" There is No cars Available Parking Lot "
-        else:
-            flr = math.ceil(Occupied/Slots)
-            print( f"  Park The vechicle At Floor Number {flr} ")
-            Available -= 1
-            Occupied += 1
+    def get():
+        tkn = input("Enter Your Ticket No ")
+        Token = tkn.split('.')
+        flr,sl=int(Token[0]),int(Token[1])
+        cnt = 0
+        floor = 0
+        slot=0
+        if flr <= floors and sl <= Slots:
+            for i,j in enumerate(user_responce):
+                while cnt < Slots:
+                    if i == floor and j[cnt] == '0':
+                        if floor==flr-1 and slot == sl-1:
+                            floor = floor+1
+                            slot = slot+1
+                            # print(f"floor : {floor} and slot : {slot} and value is = {j[cnt]}")
+                            j[cnt] = '1'
+                            # print(f"floor : {flr} and slot : {sl} and value is = {j[cnt]}")
+                            break                        
+                    # else:
+                    #     return 'wrong parking number'
+                        
+
+                    cnt = cnt + 1
+                    slot = slot+1 
+                cnt = 0
+                slot = 0
+                floor = floor +1
             
+            return f"{tkn} Slot is available for parking "
             
-    elif 2 == val:
-        return f'Total Vehicles Available in Parking :{Occupied} '
-    elif 3 == val:
-        return f" Total Availables Slots For Parking {Available}"
-    
-    else:
-        if  Available == count:
-            return f"Parking Lot is Empty"
+                
         else:
-            Occupied -=  1
-            Available += 1
+            return 'Please  Enter Valid Token No'
+
+    def view():
+        for k in user_responce:
+            print(k)
+        return ' '
+
+    def save():
+        available = 0
+        occupied = 0
+        floor = 0
+        floor1 = 0
+        count = floors*Slots
+        ls =[]
+        for k in user_responce:
+            floor_count_a = k.count('1')
+            floor_count_o = k.count('0')
+            available+=floor_count_a
+            occupied +=floor_count_o
+            floor+=1
+            floor1+=1
+            print(k)
+
+            ls.append(str(k))
+        print(type(ls))
+        print(ls)
+        with open('task.txt','w') as tfile:
+            tfile.write('  '.join(ls))
 
 
-    ls = [Available,Occupied,count]
-    f = open('task.txt','w+')
-    f.write(str(ls))
-    f.close()
-    # print('Parked At  : ',count)
-    print('Total Vehicles Available : ',Available)
-    print('Total Vehicles Occupied : ',Occupied)
-    print( f'Total Slots For Building :{count} ')
- 
-parking()
+        print('Done')
+        print(available,' available')
+        print(occupied,' occupied')
+        print(count,' total')
+            
+    choice=int(input("You response: "))
+    op_dict={1:'print(f" {parking()}")&Park(user_responce,floors,Slots)',2:'print(slotsavailable())&Park(user_responce,floors,Slots)',
+             3:'print(f" {get()}")&Park(user_responce,floors,Slots)',4:'print(f" {view()}")&Park(user_responce,floors,Slots)',5:'save()&print("Exiting The Building")'}
+    for i in op_dict[choice].split('&'):
+      eval(i)
+    return
